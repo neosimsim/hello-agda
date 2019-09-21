@@ -1,0 +1,25 @@
+bla bla
+\begin{code}
+module unicode where
+
+open import IO
+open import Data.Bool
+
+if_☺_☹_ : {A : Set} -> Bool -> A -> A -> A
+if true ☺ x ☹ y = x
+if false ☺ x ☹ y = y
+
+main = if true ☺ (run (putStrLn "Hallo, Welt!")) ☹ (run (putStrLn "Hello, World!"))
+
+\end{code}
+
+more…
+\begin{code}
+data ℕ : Set where
+  zero  : ℕ
+  suc   : ℕ → ℕ
+
+_+_ : ℕ → ℕ → ℕ
+zero   + n = n
+suc m  + n = suc (m + n)
+\end{code}

@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[12pt]{article}
 
 \usepackage{neosimsim}
 \usepackage{neosimsim-a4paper}
@@ -6,9 +6,129 @@
 \usepackage[backend=biber]{biblatex}
 \addbibresource{bibliography.bib}
 
-\lstnewenvironment{code}{}{}
 \newcommand{\ignore}[1]{}
+\usepackage{fancyvrb}
+
+\DefineVerbatimEnvironment%
+  {code}{Verbatim}
+  {frame=single} % Add fancy options here if you like.
+
+\DefineVerbatimEnvironment%
+  {listing}{Verbatim}
+  {frame=single} % Add fancy options here if you like.
 
 \begin{document}
-Hallo
+\section{Installation}
+I feel Agda a quite hard to setup. Especially compared to Haskell. This is even
+more true if you use Stack and you have to do is call \verb+wget+ once.
+
+\subsection{Agda}
+The installation of \verb+agda+ turned out to be tricky.
+When I tried to install \verb+agda+ for the first time I just used \verb+cabal+
+instead \verb+stack+. I clearly recommend to use \verb+stack+ now.
+
+\begin{lstlisting}
+cabal v2-install Agda
+stack install Agda
+\end{lstlisting}
+
+The package \emph{Agda} installs to binaries
+
+\begin{description}
+	\item[agda] The Agda compiler
+	\item[agda-mode] An Agda emacs front-end
+
+		I won't go into \verb+agda-mode+ since I'm a vim guy.
+\end{description}
+
+You can also check your systems package manager.
+\begin{lstlisting}
+pacman -S agda
+apt-get install agda-mode
+\end{lstlisting}
+
+For further information, please have a look at the Agda User
+Guide~\cite{agda-user-guide}.
+
+Using Stack you might experience problems with extra-deps. As a personal
+recommendation I use the following script to invoke \verb+agda+:
+\lstinputlisting[caption=agda]{agda}
+Keep this file some where in \verb+$PATH+ as \verb+agda+.
+
+\subsection{Agda StdLib}
+Agda has a some built-in modules, but you want at least to install
+the agda-stdlib~\cite{agda-stdlib} to really have fun with Agda.
+
+Like any good programming language, Agda has no really development
+infrastructure. There are two more or less convenient ways to install
+libraries for Agda.
+
+\begin{description}
+	\item[Manually] Download the standard library~\cite{agda-stdlib}.
+		\begin{lstlisting}[caption={\$HOME/.agda/libraries}]
+/home/neosimsim/src/agda/std-lib
+		\end{lstlisting}
+		\begin{lstlisting}[caption={\$HOME/.agda/defaults}]
+standard-library
+		\end{lstlisting}
+	\item[agda-pkg] An Agda package manager written in python.
+		\begin{lstlisting}
+pip install agda-pkg
+apkg init
+apkg install standard-library
+		\end{lstlisting}
+
+		Keep in mind that it's a Python tool and might break after some update
+		due to dynamic dependencies. It's a scripting language after all.
+\end{description}
+
+\subsection{VIM}
+
+Agda makes heavy use of mathematical symbols, e. g. ℕ and ℤ. So you should be able
+to type them in your editor. For vim you can find proper vim-scripts on the
+Agda wiki page~\cite{vim-editing}.
+
+Here are snippets of the files.
+\lstinputlisting[caption={.vim/ftplugin/agda.vim},lastline=10]{agda.vim}
+\lstinputlisting[caption={.vim/ftplugin/unicode-keys.vim},lastline=10]{unicode-keys.vim}
+Safe them under the proper location.
+
+Then you have to tell vim how to detect Agda files.
+\begin{lstlisting}[caption={.vim/ftdetect/agda.vim}]
+autocmd BufNewFile,BufReadPost *.agda set filetype=agda
+autocmd BufNewFile,BufReadPost *.lagda.md set filetype=agda
+autocmd BufNewFile,BufReadPost *.lagda.tex set filetype=agda
+\end{lstlisting}
+
+A more general way is provided by a command line tool I wrote.
+
+\begin{listing}
+echo "\N" | uni
+ℕ
+\end{listing}
+
+This can be used from withing vim, e. g.\ in visual line mode and typing
+\begin{listing}
+:'<,'>!uni
+\end{listing}
+
+I you still use X11 you can also create the file
+\lstinputlisting[caption={~/.Xmodmap}]{Xmodmap}
+and call
+\begin{listing}
+xmodmap ~/.Xmodmap
+\end{listing}
+Then you can type ℕ by pressing AltGr-n.
+
+\section{Hello World}
+\lstinputlisting[caption={hello-world.agda}]{hello-world.agda}
+
+\section{Coming From Haskell}
+\subsection{Unicode}
+boo
+\input{unicode.lagda.tex}
+\subsection{Mixfix}
+\section{}
+
+\printbibliography{}
 \end{document}

@@ -3,17 +3,16 @@
 import           Control.Monad
 import           Development.Shake
 import           Development.Shake.FilePath
-import           System.Directory
 import           System.Exit
 
 main :: IO ()
 main =
   shakeArgs shakeOptions {shakeFiles = "_build"} $ do
-    want ["_build/hello-agda.pdf"]
+    want ["_build/hello-agda.pdf", "_build/hello-world", "_build/unicode"]
     "_build/hello-agda.pdf" %> \out -> do
       let src = out -<.> "tex.pdf"
       need [src]
-      liftIO $ renameFile src out
+      copyFileChanged src out
     phony "clean" $ do
       putNormal "Clean files in _build"
       removeFilesAfter "_build" ["//*"]
@@ -21,7 +20,7 @@ main =
     "_build//*.tex.pdf" %> \out -> do
       let src = (dropDirectory1 . dropExtension) out
       let logFile = out -<.> "log"
-      need [src, "bibliography.bib"]
+      need [src, "bibliography.bib", "hello-world.agda", "unicode.lagda.tex"]
       latex src
       (Exit grepBiberExit) <-
         cmd "grep -q" ["Please (re)run Biber on the file:", logFile]
@@ -35,6 +34,10 @@ main =
       when (grepReferencesExit == ExitSuccess) $ latex src
     "_build/hello-world" %> \out -> do
       let src = dropDirectory1 out <.> "agda"
+      need [src]
+      cmd "./agda --compile --compile-dir _build" [src]
+    "_build/unicode" %> \out -> do
+      let src = dropDirectory1 out <.> "lagda.tex"
       need [src]
       cmd "./agda --compile --compile-dir _build" [src]
 
