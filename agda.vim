@@ -1,5 +1,3 @@
-syntax on
-colorscheme solarized
 source ~/.vim/ftplugin/unicode-keys.vim
 " Superscripts
 imap <buffer> ^0 ⁰

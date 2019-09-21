@@ -1,29 +1,44 @@
 \documentclass[12pt]{article}
 
 \usepackage{neosimsim}
-\usepackage{neosimsim-a4paper}
+\usepackage{neosimsim-a5paper}
 
 \usepackage[backend=biber]{biblatex}
 \addbibresource{bibliography.bib}
 
-\newcommand{\ignore}[1]{}
+\usepackage{titlesec}
+\newcommand{\sectionbreak}{\clearpage}
+
 \usepackage{fancyvrb}
+\newcommand{\ignore}[1]{}
 
 \DefineVerbatimEnvironment%
   {code}{Verbatim}
   {frame=single} % Add fancy options here if you like.
 
 \DefineVerbatimEnvironment%
-  {listing}{Verbatim}
+  {neolisting}{Verbatim}
   {frame=single} % Add fancy options here if you like.
+
+% https://tex.stackexchange.com/questions/18322/using-fancyvrb-verbatim-environment-from-within-newenvironment
+\usepackage{fancyvrb,caption,floatrow}
+\DeclareNewFloatType{neolistingfloat}{placement=t,fileext=neolisting,name=Listing}
+\captionsetup[neolistingfloat]{}
+
+\newenvironment{neocaplisting}[2]
+{\VerbatimEnvironment%
+ \captionof{neolistingfloat}{#2}\ifx\relax#1\relax\else\label{#1}\fi%
+\begin{Verbatim}[frame=single]}
+{\end{Verbatim}}
 
 \begin{document}
 \section{Installation}
 I feel Agda a quite hard to setup. Especially compared to Haskell. This is even
-more true if you use Stack and you have to do is call \verb+wget+ once.
+more true if you use Stack and all you have to do, is call \verb+wget+ once.
+
+We also need to preapre our editor for unicode input.
 
 \subsection{Agda}
-The installation of \verb+agda+ turned out to be tricky.
 When I tried to install \verb+agda+ for the first time I just used \verb+cabal+
 instead \verb+stack+. I clearly recommend to use \verb+stack+ now.
 
@@ -53,15 +68,16 @@ Guide~\cite{agda-user-guide}.
 Using Stack you might experience problems with extra-deps. As a personal
 recommendation I use the following script to invoke \verb+agda+:
 \lstinputlisting[caption=agda]{agda}
+This script, by the philosophy of Stack, should always work.
 Keep this file some where in \verb+$PATH+ as \verb+agda+.
 
 \subsection{Agda StdLib}
-Agda has a some built-in modules, but you want at least to install
+Agda has some built-in modules, but you want at least install
 the agda-stdlib~\cite{agda-stdlib} to really have fun with Agda.
 
 Like any good programming language, Agda has no really development
-infrastructure. There are two more or less convenient ways to install
-libraries for Agda.
+infrastructure, e. g.\ no real package/dependency manager. There are two more
+or less convenient ways to install libraries for Agda.
 
 \begin{description}
 	\item[Manually] Download the standard library~\cite{agda-stdlib}.
@@ -89,8 +105,35 @@ to type them in your editor. For vim you can find proper vim-scripts on the
 Agda wiki page~\cite{vim-editing}.
 
 Here are snippets of the files.
-\lstinputlisting[caption={.vim/ftplugin/agda.vim},lastline=10]{agda.vim}
-\lstinputlisting[caption={.vim/ftplugin/unicode-keys.vim},lastline=10]{unicode-keys.vim}
+
+\begin{neocaplisting}{}{\$HOME/.vim/ftplugin/agda.vim}
+source ~/.vim/ftplugin/unicode-keys.vim
+imap <buffer> \N ℕ
+imap <buffer> \Z ℤ
+imap <buffer> \C ℂ
+imap <buffer> \Q ℚ
+imap <buffer> \R ℝ
+imap <buffer> \E 𝔼
+imap <buffer> \F 𝔽
+imap <buffer> \to →
+imap <buffer> \mapsto ↦
+imap <buffer> \infty ∞
+imap <buffer> \cong ≅
+\end{neocaplisting}
+
+\begin{neocaplisting}{}{\$HOME/.vim/ftplugin/unicode-keys.vim}
+imap <leader>to →
+imap <leader>- →
+imap <C-_> →
+imap <leader>To ⇒
+imap <leader>= ⇒
+imap <leader>top ⊤
+imap <leader>tuple ⟨⟩<left>
+imap <leader>up ↑
+imap <leader>updown ↕
+imap <leader>ud ↕
+\end{neocaplisting}
+
 Safe them under the proper location.
 
 Then you have to tell vim how to detect Agda files.
@@ -100,25 +143,29 @@ autocmd BufNewFile,BufReadPost *.lagda.md set filetype=agda
 autocmd BufNewFile,BufReadPost *.lagda.tex set filetype=agda
 \end{lstlisting}
 
-A more general way is provided by a command line tool I wrote.
+A more general way is provided by a command line tool I wrote~\cite{scripts-uni}.
 
-\begin{listing}
+\begin{neolisting}
 echo "\N" | uni
 ℕ
-\end{listing}
+\end{neolisting}
 
 This can be used from withing vim, e. g.\ in visual line mode and typing
-\begin{listing}
+\begin{neolisting}
 :'<,'>!uni
-\end{listing}
+\end{neolisting}
+and also works on any other propper editor, like sam and acme.
 
-I you still use X11 you can also create the file
-\lstinputlisting[caption={~/.Xmodmap}]{Xmodmap}
+If you still use X11 (on Linux) you can also create the file
+\lstinputlisting[caption={\$HOME/.Xmodmap}]{Xmodmap}
 and call
-\begin{listing}
-xmodmap ~/.Xmodmap
-\end{listing}
+\begin{neolisting}
+xmodmap $HOME/.Xmodmap
+\end{neolisting}
+
 Then you can type ℕ by pressing AltGr-n.
+
+If anyone knows a way how todo this in Wayland, please let me know.
 
 \section{Hello World}
 \lstinputlisting[caption={hello-world.agda}]{hello-world.agda}
@@ -128,7 +175,6 @@ Then you can type ℕ by pressing AltGr-n.
 boo
 \input{unicode.lagda.tex}
 \subsection{Mixfix}
-\section{}
 
 \printbibliography{}
 \end{document}
