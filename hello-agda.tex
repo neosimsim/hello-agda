@@ -100,9 +100,12 @@ apkg install standard-library
 
 \subsection{VIM}
 
+\subsubsection{Unicode}
 Agda makes heavy use of mathematical symbols, e. g. ℕ and ℤ. So you should be able
-to type them in your editor. For vim you can find proper vim-scripts on the
-Agda wiki page~\cite{vim-editing}.
+to type them in your editor.
+
+\paragraph{VIM key maps}
+For vim you can find proper vim-scripts on the Agda wiki page~\cite{vim-editing}.
 
 Here are snippets of the files.
 
@@ -143,6 +146,7 @@ autocmd BufNewFile,BufReadPost *.lagda.md set filetype=agda
 autocmd BufNewFile,BufReadPost *.lagda.tex set filetype=agda
 \end{lstlisting}
 
+\paragraph{Unix Pipes}
 A more general way is provided by a command line tool I wrote~\cite{scripts-uni}.
 
 \begin{neolisting}
@@ -156,19 +160,29 @@ This can be used from withing vim, e. g.\ in visual line mode and typing
 \end{neolisting}
 and also works on any other propper editor, like sam and acme.
 
+\paragraph{xmodmap}
 If you still use X11 (on Linux) you can also create the file
 \lstinputlisting[caption={\$HOME/.Xmodmap}]{Xmodmap}
 and call
 \begin{neolisting}
 xmodmap $HOME/.Xmodmap
 \end{neolisting}
-
 Then you can type ℕ by pressing AltGr-n.
 
 If anyone knows a way how todo this in Wayland, please let me know.
 
+\subsubsection{agda-vim}
+You should also install agda-vim~\cite{agda-vim}, which is to vim what
+agda-mode is to emacs. This plugin provides an interface to Agdas Auto
+tool, which is an automatic proof search. We will see how this tools works
+in a minute.
+
 \section{Hello World}
 \lstinputlisting[caption={hello-world.agda}]{hello-world.agda}
+
+\begin{neolisting}
+agda --compile hello-world.agda
+\end{neolisting}
 
 \section{Coming From Haskell}
 \subsection{Unicode}
