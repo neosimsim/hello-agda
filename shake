@@ -1,9 +1,10 @@
 #!/usr/bin/env stack
--- stack --resolver lts-14.6 script --package shake --package directory --ghc-options -Wall --ghc-options -Werror --ghc-options -rtsopts --ghc-options "-with-rtsopts=-I0 -N" --ghc-options -threaded
+-- stack --resolver lts-14.6 script --package shake --package directory --package filemanip --ghc-options -Wall --ghc-options -Werror --ghc-options -rtsopts --ghc-options "-with-rtsopts=-I0 -N" --ghc-options -threaded
 import           Control.Monad
 import           Development.Shake
 import           Development.Shake.FilePath
 import           System.Exit
+import           System.FilePath.Find       (always, extension, find, (==?))
 
 main :: IO ()
 main =
@@ -40,6 +41,27 @@ main =
       let src = dropDirectory1 out <.> "lagda.tex"
       need [src]
       cmd "./agda --compile --compile-dir _build" [src]
+    phony "agda" $ do
+      agdaFiles <- liftIO $ find always (extension ==? ".agda") "src"
+      let agdaDests =
+            fmap
+              (("_build/MAlonzo/Code" </>) . dropDirectory1 . (-<.> "hs"))
+              agdaFiles
+      need agdaDests
+    "_build/MAlonzo/Code//*.hs" %> \out -> do
+      let agdaFile =
+            dropDirectory1 . dropDirectory1 . dropDirectory1 $ out -<.> "agda"
+      need ["src" </> agdaFile]
+      command_
+        [AddPath [] [], Cwd "src"]
+        "../agda"
+        [ "--compile"
+        , "--no-main"
+        , "--ghc-dont-call-ghc"
+        , "--compile-dir"
+        , "../_build"
+        , agdaFile
+        ]
 
 latex :: FilePath -> Action ()
 latex src = do
