@@ -2,6 +2,8 @@ module hello-world where
 
 open import IO
 open import Data.String
+open import Data.Nat
+open import Data.Vec
 
 main = run (putStrLn "Hello World!")
 
@@ -18,3 +20,8 @@ new x = x
 
 _plus_ : {A : Set} -> A -> A -> A
 x plus y = x
+
+
+vec : Vec Bool 1
+vec = true ∷ []
+
