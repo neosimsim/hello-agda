@@ -33,3 +33,5 @@ A few things to notice:
 \begin{exercise}
 Move the definition of `age` after `main`.
 \end{exercise}
+
+Why: Prevents you from propositions stating theselfe.
