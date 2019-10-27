@@ -63,14 +63,23 @@ zero + m = m
 suc n + m = suc (n + m)
 \end{code}
 
-Does this work? Let's write “tests”. We need some imports.
+Since we are all good programmers we want to test this functions.
+We need some imports.
 \begin{code}
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; refl; cong; sym)
 open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; _≡⟨_⟩_; _∎)
 \end{code}
 
-We this we can write a test for $2 + 3$
+We this we can write a unit test for \verb=_+_=.
+\begin{code}
+_ : 2 + 3 ≡ 5
+_ = refl
+\end{code}
+For now (this little moment in time) you can think of \verb+refl+ as
+of an assertion.
+
+We can write the test in a more human readable form.
 \begin{code}
 _ : 2 + 3 ≡ 5
 _ =
@@ -86,14 +95,10 @@ _ =
     5
   ∎
 \end{code}
-This is in fact the human readably version of the test. Agda does not need
-avery step. In fact everything Agda does is to check that every expression
+Other than us humans Agda does not need every step. In fact everything Agda does is to check
+that every expression
 in the test reduces to the same expression. Since Agda can reduce the expressions
-we cound just write
-\begin{code}
-_ : 2 + 3 ≡ 5
-_ = refl
-\end{code}
+we could just use \verb+refl+.
 
 This is a lot to swallow. First we notice that \verb=2 + 3 ≡ 5= is a type signature.
 
@@ -114,7 +119,7 @@ The variable name \verb+_+ states, that we don't care about the variable itself.
 \begin{verbatim}
 _ = refl
 \end{verbatim}
-tells Agda to find an inhabitant of the type \verb=2 + 3 ≡ 5=, if it can
+tells Agda to construct an inhabitant of the type \verb=2 + 3 ≡ 5=, if it can
 we know they are equal.
 
 With that in mind we could say that we wrote a proof for $2+3$ and not just a test.
