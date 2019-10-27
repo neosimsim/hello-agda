@@ -9,25 +9,22 @@ import           System.FilePath.Find       (always, extension, find, (==?))
 main :: IO ()
 main =
   shakeArgs shakeOptions {shakeFiles = "_build"} $ do
-    want ["pdf", "_build/hello-world", "_build/unicode"]
+    want ["pdf", "agda"]
     phony "pdf" $ need ["_build/hello-agda.pdf"]
     "_build/hello-agda.pdf" %> \out -> do
       let src = out -<.> "tex.pdf"
       need [src]
       copyFileChanged src out
-    phony "clean" $ do
-      putNormal "Clean files in _build"
-      removeFilesAfter "_build" ["//*"]
-      removeFilesAfter "." ["//*.agdai"]
-    "_build//*.tex.pdf" %> \out -> do
+    "_build//*.tex.pdf" %> \out -> do -- could be extracted: latexWithNeeds :: [FilePath] -> (FilePath -> Action ())
       let src = (dropDirectory1 . dropExtension) out
       let logFile = out -<.> "log"
       need [src
         , "bibliography.bib"
         , "hello-world.agda"
         , "unicode.lagda.tex"
+        , "_build/installation.tex"
         , "_build/hello-world.tex"
-        , "_build/installation.tex"]
+        , "src/Naturals.lagda.tex"]
       latex src
       (Exit grepBiberExit) <-
         cmd "grep -q" ["Please (re)run Biber on the file:", logFile]
@@ -43,25 +40,26 @@ main =
       let src = dropDirectory1 out -<.> "md"
       need [src]
       cmd "pandoc --filter pandoc-include-code -f markdown+raw_tex+raw_attribute -t latex-smart -o" [out] [src]
-    "_build/hello-world" %> \out -> do
-      let src = dropDirectory1 out <.> "agda"
-      need [src]
-      cmd "./agda --compile --compile-dir _build" [src]
-    "_build/unicode" %> \out -> do
-      let src = dropDirectory1 out <.> "lagda.tex"
-      need [src]
-      cmd "./agda --compile --compile-dir _build" [src]
     phony "agda" $ do
       agdaFiles <- liftIO $ find always (extension ==? ".agda") "src"
       let agdaDests =
             fmap
               (("_build/MAlonzo/Code" </>) . dropDirectory1 . (-<.> "hs"))
               agdaFiles
-      need agdaDests
+      lagdaFiles <- liftIO $ find always (extension ==? ".tex") "src"
+      let lagdaDests =
+            fmap
+              (("_build/MAlonzo/Code" </>) . dropDirectory1 . (-<.> "hs") . dropExtension)
+              lagdaFiles
+      need $ agdaDests ++ lagdaDests
     "_build/MAlonzo/Code//*.hs" %> \out -> do
       let agdaFile =
             dropDirectory1 . dropDirectory1 . dropDirectory1 $ out -<.> "agda"
-      need ["src" </> agdaFile]
+      exists <- doesFileExist $ "src" </> agdaFile
+      let src = if exists
+          then agdaFile
+          else dropDirectory1 . dropDirectory1 . dropDirectory1 $ out -<.> "lagda.tex"
+      need ["src" </> src]
       command_
         [AddPath [] [], Cwd "src"]
         "../agda"
@@ -70,8 +68,20 @@ main =
         , "--ghc-dont-call-ghc"
         , "--compile-dir"
         , "../_build"
-        , agdaFile
+        , src
         ]
+    "_build/hello-world" %> \out -> do
+      let src = dropDirectory1 out <.> "agda"
+      need [src]
+      cmd "./agda --compile --compile-dir _build" [src]
+    "_build/unicode" %> \out -> do
+      let src = dropDirectory1 out <.> "lagda.tex"
+      need [src]
+      cmd "./agda --compile --compile-dir _build" [src]
+    phony "clean" $ do
+      putNormal "Clean files in _build"
+      removeFilesAfter "_build" ["//*"]
+      removeFilesAfter "." ["//*.agdai"]
 
 latex :: FilePath -> Action ()
 latex src = do
