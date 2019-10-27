@@ -1,0 +1,200 @@
+\section{Natural numbers}
+Now that we can write code in Agda, our next goal to understand why we
+want to write code in Agda, i. e. we want to write code that can’t be
+written in other languages. Not even in Haskell—well not yet, or at
+least not in an easy way.
+
+I mean of course the best feature a programming language can have
+\emph{Dependent Types}. The standard example for Dependent Types is the
+fix thength vector. Don’t worry, if you don’t know what I mean by that
+you will soon.
+
+Before we can describe fix length vectors we have to be able to describe
+length. What better way to desribe length but with natural numbers.
+
+\begin{code}
+module Naturals where
+
+data ℕ : Set where
+  zero : ℕ
+  suc : ℕ → ℕ
+\end{code}
+
+That's all we need, to desribe every natural number possible.
+Quite cool when you think about it. No little-endian no big-endian.
+
+Let't define some natural numbers
+
+\begin{code}
+null : ℕ
+null = zero
+
+three : ℕ
+three = suc (suc (suc zero))
+\end{code}
+
+\begin{exercise}
+  Define \verb+fivethousand+.
+\end{exercise}
+
+GOTCHA!!!
+
+We can tell Agda to use Haskell builtin Integers as \verb+ℕ+.
+
+\begin{code}
+{-# BUILTIN NATURAL ℕ #-}
+
+fivethousand : ℕ
+fivethousand = 5000000
+\end{code}
+
+Let's define additions.
+
+\begin{code}
+infixl 40 _+_
+_+_ : ℕ → ℕ → ℕ
+\end{code}
+
+Using \verb+_+ in function names we define pre/in/mix/post-fix operators. The
+$n$-th arguments takes place of the $n$-th \verb+_+.
+
+\begin{code}
+zero + m = m
+suc n + m = suc (n + m)
+\end{code}
+
+Does this work? Let's write “tests”. We need some imports.
+\begin{code}
+import Relation.Binary.PropositionalEquality as Eq
+open Eq using (_≡_; refl; cong)
+open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; _≡⟨_⟩_; _∎)
+\end{code}
+
+We this we can write a test for $2 + 3$
+\begin{code}
+_ : 2 + 3 ≡ 5
+_ =
+  begin
+    2 + 3
+  ≡⟨⟩
+    suc (1 + 3)
+  ≡⟨⟩
+    suc (suc (0 + 3))
+  ≡⟨⟩
+    suc (suc 3)
+  ≡⟨⟩
+    5
+  ∎
+\end{code}
+This is in fact the human readably version of the test. Agda does not need
+avery step. In fact everything Agda does is to check that every expression
+in the test reduces to the same expression. Since Agda can reduce the expressions
+we cound just write
+\begin{code}
+_ : 2 + 3 ≡ 5
+_ = refl
+\end{code}
+
+This is a lot to swallow. First we notice that \verb=2 + 3 ≡ 5= is a type signature.
+
+\begin{verbatim}
+infix 4 _≡_
+data _≡_ {a} {A : Set a} (x : A) : A → Set a where
+  instance refl : x ≡ x
+\end{verbatim}
+This is the type of elements which are equal to itself, hence \emph{reflexive}.
+
+So
+\begin{verbatim}
+_ : 2 + 3 ≡ 5
+\end{verbatim}
+defines a variable \verb+_+ containing the information that $2+3$ is equal to $5$.
+The variable name \verb+_+ states, that we don't care about the variable itself.
+
+\begin{verbatim}
+_ = refl
+\end{verbatim}
+tells Agda to find an inhabitant of the type \verb=2 + 3 ≡ 5=, if it can
+we know they are equal.
+
+With that in mind we could say that we wrote a proof for $2+3$ and not just a test.
+The cool thing is, that Agda verifies the proof at compile time, so no need to
+actually “run the test”.
+
+We just experienced the conecpt of “Proposition as Types” — whooooo
+
+If course this proof is as useful as any other unit test … not at all.
+We test addition for 2 natural numbers this is a fraction of 0\,\%.
+
+We could use QuickCheck to run property test. But again 0\,\% coverage.
+
+In Agda we can proof properties. We know a few properties of addition:
+\begin{itemize}
+  \item $0$ is the natural element
+  \item assosiative
+  \item commutative
+\end{itemize}
+
+\begin{code}
++-rightNeutral : ∀ (m : ℕ) → m + zero ≡ m
++-rightNeutral zero =
+  begin
+    zero + zero
+  ≡⟨⟩
+    zero
+  ∎
++-rightNeutral (suc m) =
+  begin
+    suc m + zero
+  ≡⟨⟩
+    suc (m + zero)
+  ≡⟨ cong  suc (+-rightNeutral m) ⟩ -- congruent
+    suc m
+  ∎
+\end{code}
+
+We defined \verb=_+_= left inductive. We will need a lemma, that
+it is equivalent to right induktive.
+\begin{code}
++-suc : ∀ (m n : ℕ) → m + suc n ≡ suc (m + n)
++-suc zero n =
+  begin
+    zero + suc n
+  ≡⟨⟩
+    suc n
+  ≡⟨⟩
+    suc (zero + n)
+  ∎
++-suc (suc m) n =
+  begin
+    suc m + suc n
+  ≡⟨⟩
+    suc (m + suc n)
+  ≡⟨ cong suc (+-suc m n) ⟩
+    suc (suc (m + n))
+  ≡⟨⟩
+    suc (suc m + n)
+  ∎
+\end{code}
+
+\begin{code}
++-commutative : ∀ (n m : ℕ) → n + m ≡ m + n
++-commutative m zero = -- why does zero m not work?
+  begin
+    m + zero
+  ≡⟨ +-rightNeutral m ⟩
+    m
+  ≡⟨⟩
+    zero + m
+  ∎
++-commutative m (suc n) =
+  begin
+    m + suc n
+  ≡⟨ +-suc m n ⟩
+    suc (m + n)
+  ≡⟨ cong suc (+-commutative m n) ⟩
+    suc (n + m)
+  ≡⟨⟩
+    suc n + m
+  ∎
+\end{code}

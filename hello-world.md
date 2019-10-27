@@ -24,6 +24,9 @@ A few things to notice:
 -	Agda import are qualified by default. Using the `open` statement
 	we can use the import unqualified.
 
+-	The using statement is optional, although in Haskell it turned out
+	to be good practice.
+
 -	Type signatures are are defined using a single colon `:` instead
 	of `::`. This will bother you a couple of time 😉.
 
