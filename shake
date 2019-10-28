@@ -26,7 +26,8 @@ main =
         , "_build/installation.md.tex"
         , "_build/hello-world.md.tex"
         , "src/Naturals.lagda.tex"
-        , "_build/Vector.lagda.tex"]
+        , "_build/Vector.lagda.tex"
+        , "_build/Bool.lagda.tex"]
       latex src
       (Exit grepBiberExit) <-
         cmd "grep -q" ["Please (re)run Biber on the file:", logFile]

@@ -1,4 +1,4 @@
-\section{Natural numbers}
+\section{Natural Numbers}
 Now that we can write code in Agda, our next goal to understand why we
 want to write code in Agda, i. e. we want to write code that can’t be
 written in other languages. Not even in Haskell—well not yet, or at
@@ -17,14 +17,42 @@ module Naturals where
 
 data ℕ : Set where
   zero : ℕ
-  suc : ℕ → ℕ
+  suc  : ℕ → ℕ
 \end{code}
 
-That's all we need, to desribe every natural number possible.
-Quite cool when you think about it. No little-endian no big-endian.
+What's that? This is an algebraic data type similar to those we wrote and use
+in Haskell all day long, or at least we would if we could use Haskell all day
+long at work.
 
-Let't define some natural numbers
+\begin{verbatim}
+data Nat = Zero | Suc Nat
+\end{verbatim}
 
+If we write the same with Haskells GADTs extension we see the resemblanse:
+
+\begin{verbatim}
+data Nat where
+  Zero  :: Nat
+  Suc   :: Nat -> Nat
+\end{verbatim}
+
+So far so good, but what about \verb+Set Whe state that \verb+Bool+ is of type
+\verb+Set+, which is the type of small types. In Haskell we would say of kind `*`.
+\verb+Set+ itself is of type \verb+Set1+ which is of type \verb+Set2+ and so on. In Haskell
+we would say nothing like this.
+
+\begin{verbatim}
+data Bool :: * where
+  Zero  :: Nat
+  Suc   :: Nat -> Nat
+\end{verbatim}
+
+In other word beeing a Type in Haskell means beeing a Set in Agda.
+
+That's all we need, to describe every natural number possible.
+Quite cool when you think about it. No little-endian, no big-endian.
+
+Let's define some natural numbers:
 \begin{code}
 null : ℕ
 null = zero
@@ -49,7 +77,6 @@ fivethousand = 5000000
 \end{code}
 
 Let's define additions.
-
 \begin{code}
 infixl 6 _+_
 _+_ : ℕ → ℕ → ℕ
@@ -57,13 +84,12 @@ _+_ : ℕ → ℕ → ℕ
 
 Using \verb+_+ in function names we define pre/in/mix/post-fix operators. The
 $n$-th arguments takes place of the $n$-th \verb+_+.
-
 \begin{code}
 zero + m = m
 suc n + m = suc (n + m)
 \end{code}
 
-Since we are all good programmers we want to test this functions.
+Since we are all good programmers we want to test this function.
 We need some imports.
 \begin{code}
 import Relation.Binary.PropositionalEquality as Eq
@@ -71,7 +97,7 @@ open Eq using (_≡_; refl; cong; sym)
 open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; _≡⟨_⟩_; _∎)
 \end{code}
 
-We this we can write a unit test for \verb=_+_=.
+With this we can write a unit test for \verb=_+_=.
 \begin{code}
 _ : 2 + 3 ≡ 5
 _ = refl
@@ -95,19 +121,15 @@ _ =
     5
   ∎
 \end{code}
-Other than us humans Agda does not need every step. In fact everything Agda does is to check
-that every expression
-in the test reduces to the same expression. Since Agda can reduce the expressions
-we could just use \verb+refl+.
 
 This is a lot to swallow. First we notice that \verb=2 + 3 ≡ 5= is a type signature.
-
+And \verb+_≡_+ is a type constructor.
 \begin{verbatim}
 infix 4 _≡_
 data _≡_ {a} {A : Set a} (x : A) : A → Set a where
   instance refl : x ≡ x
 \end{verbatim}
-This is the type of elements which are equal to itself, hence \emph{reflexive}.
+\verb+x ≡ x+ is the type of elements which are equal to itself, hence \emph{reflexive}.
 
 So
 \begin{verbatim}
@@ -122,18 +144,28 @@ _ = refl
 tells Agda to construct an inhabitant of the type \verb=2 + 3 ≡ 5=, if it can
 we know they are equal.
 
-With that in mind we could say that we wrote a proof for $2+3$ and not just a test.
+\begin{exercise}
+Write a test for $3+4$.
+\end{exercise}
+
+Unlike humans, Agda does not need every step. In fact everything Agda
+does is to check, that every expression between \verb+≡⟨⟩+ reduces to the
+same expression. Since Agda can reduce the expressions without further
+information we could just use \verb+refl+.
+
+\subsection{Proofs}
+With that in mind we could say that we did not just write a test $2+3$ but a proof.
 The cool thing is, that Agda verifies the proof at compile time, so no need to
 actually “run the test”.
 
-We just experienced the conecpt of “Proposition as Types” — whooooo
+We just experienced the phenomenon of “Proposition as Types” — whooooo
 
 If course this proof is as useful as any other unit test … not at all.
 We test addition for 2 natural numbers this is a fraction of 0\,\%.
 
 We could use QuickCheck to run property test. But again 0\,\% coverage.
 
-In Agda we can proof properties. We know a few properties of addition:
+In Agda we can do better but first we need some properties for addition to fulfill:
 \begin{itemize}
   \item $0$ is the neutral element
   \item assosiative
@@ -159,11 +191,19 @@ know that \verb+zero+ is neutral rom the left by definition.
     suc m
   ∎
 \end{code}
+Agda makes it explicit that proof by induction is the same a programming
+with recursion.
 
-We defined \verb=_+_= left inductive. We will need a lemma, that
-it is equivalent to right inductive.
+\begin{exercise}
+We defined \verb=_+_= left inductive. Proof that it \verb=_+_= is to right inductive, too.
+I. e. proof
+
 \begin{code}
 +-suc : ∀ (m n : ℕ) → m + suc n ≡ suc (m + n)
+\end{code}
+\end{exercise}
+
+\begin{code}
 +-suc zero n =
   begin
     zero + suc n
@@ -184,6 +224,7 @@ it is equivalent to right inductive.
   ∎
 \end{code}
 
+Whit that lemma we can proof commutativity.
 \begin{code}
 +-commutative : ∀ (n m : ℕ) → n + m ≡ m + n
 +-commutative zero m =

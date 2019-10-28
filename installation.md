@@ -1,5 +1,5 @@
 # Installation
-I feel Agda a quite hard to setup. Especially compared to Haskell. This is even
+I feel Agda is quite tricky to setup. Especially compared to Haskell. This is even
 more true if you use Stack and all you have to do, is call \verb+wget+ once.
 
 We also need to prepare our editor for unicode input.
@@ -27,7 +27,8 @@ The package *Agda* installs to binaries
 This however will not be enough. `agda` is an application on Hackage which
 has runtime dependencies. It needs certain Haskell libraries, which are nicely
 sandbox my Cabal and Stack, so not accessible by our new agda installation.
-Therefore I prefer and recommend to install Agda using one of the following wrapper scripts.
+Therefore I prefer and recommend to install Agda using one of the following
+wrapper scripts.
 
 ```{include=agda-stack}
 ```
@@ -40,9 +41,7 @@ Here is the same for nix:
 ```
 
 Save this as `agda` some where in \$PATH *before* cabal/stack/nix installation
-path.
-
-For further information, please have a look at the Agda User
+path. For further information, please have a look at the Agda User
 Guide \cite{agda-user-guide}.
 
 ## Agda Libraries
@@ -60,7 +59,7 @@ or less convenient ways to install libraries for Agda.
 cd $HOME/src
 git clone https://github.com/agda/agda-stdlib.git
 		\end{verbatim}
-		
+
 And write the following files
 
 		\begin{verbatim}
@@ -68,7 +67,7 @@ cat <<EOF >$HOME/.agda/libraries
 $HOME/src/agda/std-lib
 EOF
 		\end{verbatim}
-		
+
 		\begin{verbatim}
 cat <<EOF >$HOME/.agda/defaults
 standard-library
@@ -105,7 +104,8 @@ cabal v2-install Agda # or
 nix-env -f '<nixpkgs>' -iA haskellPackages.Agda
 \end{neolisting}
 
-Look at \cite{emacs-mode}.
+Look at \cite{emacs-mode}. The “Getting Started” section of \cite{plfa}
+has more hints for emacs setup.
 
 \subsubsection{VIM}
 Setting up vim is a more manual, so let me ask
