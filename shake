@@ -4,7 +4,8 @@ import           Control.Monad
 import           Development.Shake
 import           Development.Shake.FilePath
 import           System.Exit
-import           System.FilePath.Find       (always, extension, find, (==?))
+import           System.FilePath.Find       (always, extension, find, (==?), (||?))
+import System.Directory (doesPathExist, withCurrentDirectory)
 
 main :: IO ()
 main =
@@ -22,9 +23,10 @@ main =
         , "bibliography.bib"
         , "hello-world.agda"
         , "unicode.lagda.tex"
-        , "_build/installation.tex"
-        , "_build/hello-world.tex"
-        , "src/Naturals.lagda.tex"]
+        , "_build/installation.md.tex"
+        , "_build/hello-world.md.tex"
+        , "src/Naturals.lagda.tex"
+        , "_build/Vector.lagda.tex"]
       latex src
       (Exit grepBiberExit) <-
         cmd "grep -q" ["Please (re)run Biber on the file:", logFile]
@@ -36,8 +38,12 @@ main =
           "grep -q"
           ["LaTeX Warning: There were undefined references.", logFile]
       when (grepReferencesExit == ExitSuccess) $ latex src
-    "_build//*.tex" %> \out -> do
-      let src = dropDirectory1 out -<.> "md"
+    "_build//*.md.tex" %> \out -> do
+      let src = dropDirectory1 $ dropExtension out
+      need [src]
+      cmd "pandoc --filter pandoc-include-code -f markdown+raw_tex+raw_attribute -t latex-smart -o" [out] [src]
+    "_build//*.lagda.tex" %> \out -> do
+      let src = ("src" </>) . dropDirectory1 $ (-<.> "md") out
       need [src]
       cmd "pandoc --filter pandoc-include-code -f markdown+raw_tex+raw_attribute -t latex-smart -o" [out] [src]
     phony "agda" $ do
@@ -46,19 +52,17 @@ main =
             fmap
               (("_build/MAlonzo/Code" </>) . dropDirectory1 . (-<.> "hs"))
               agdaFiles
-      lagdaFiles <- liftIO $ find always (extension ==? ".tex") "src"
+      lagdaFiles <- liftIO $ find always (extension ==? ".tex" ||? extension ==? ".md") "src"
       let lagdaDests =
             fmap
               (("_build/MAlonzo/Code" </>) . dropDirectory1 . (-<.> "hs") . dropExtension)
               lagdaFiles
       need $ agdaDests ++ lagdaDests
     "_build/MAlonzo/Code//*.hs" %> \out -> do
-      let agdaFile =
-            dropDirectory1 . dropDirectory1 . dropDirectory1 $ out -<.> "agda"
-      exists <- doesFileExist $ "src" </> agdaFile
-      let src = if exists
-          then agdaFile
-          else dropDirectory1 . dropDirectory1 . dropDirectory1 $ out -<.> "lagda.tex"
+      src <- liftIO . withCurrentDirectory "src" $ firstFile
+        [dropDirectory1 . dropDirectory1 . dropDirectory1 $ out -<.> "agda"
+        , dropDirectory1 . dropDirectory1 . dropDirectory1 $ out -<.> "lagda.tex"
+        , dropDirectory1 . dropDirectory1 . dropDirectory1 $ out -<.> "lagda.md"]
       need ["src" </> src]
       command_
         [AddPath [] [], Cwd "src"]
@@ -91,3 +95,11 @@ latex src = do
 biber :: String -> Action ()
 biber filename =
   cmd_ "biber --input-directory _build --output-directory _build" [filename]
+
+firstFile :: [FilePath] -> IO FilePath
+firstFile [] = undefined
+firstFile (x:xs) = do
+  exist <- doesPathExist x
+  if exist
+    then return x
+    else firstFile xs
