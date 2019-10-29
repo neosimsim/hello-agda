@@ -6,11 +6,11 @@ least not in an easy way.
 
 I mean of course the best feature a programming language can have
 \emph{Dependent Types}. The standard example for Dependent Types is the
-fix thength vector. Don’t worry, if you don’t know what I mean by that
+fix length vector. Don’t worry, if you don’t know what I mean by that
 you will soon.
 
 Before we can describe fix length vectors we have to be able to describe
-length. What better way to desribe length but with natural numbers.
+length. What better way to describe length but with natural numbers.
 
 \begin{code}
 module Naturals where
@@ -28,7 +28,7 @@ long at work.
 data Nat = Zero | Suc Nat
 \end{verbatim}
 
-If we write the same with Haskells GADTs extension we see the resemblanse:
+If we write the same with Haskells GADTs extension we see the resemblance:
 
 \begin{verbatim}
 data Nat where
@@ -47,7 +47,7 @@ data Bool :: * where
   Suc   :: Nat -> Nat
 \end{verbatim}
 
-In other word beeing a Type in Haskell means beeing a Set in Agda.
+In other word being a Type in Haskell means being a Set in Agda.
 
 That's all we need, to describe every natural number possible.
 Quite cool when you think about it. No little-endian, no big-endian.

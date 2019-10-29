@@ -25,7 +25,7 @@ gravity₁ = Cons 2 0.0 (Cons 1 0.0 (Cons 0 -9.81 []))
 ```
 
 Once again this turns out to be a bit tedious. We have to pass the length
-of each intermediat vector, which if you think about should be known to agda.
+of each intermediate vector, which if you think about should be known to agda.
 If Agda can infer the arguments we can make them implicit by using curly braces.
 So lets change the definition of vector
 ```
@@ -51,7 +51,7 @@ head (x <> _) = x
 ```
 
 Note that this compiles, although we did not pattern match on `∅`.
-We don't have too, in fact we can'te pattern match on `∅`
+We don't have too, in fact we can't pattern match on `∅`
 since `∅` construct a vector with index 0, which is no successor
 to any natural number, remember?
 
