@@ -8,7 +8,7 @@ open import Agda.Builtin.Float
   using (Float; primFloatPlus; primFloatTimes)
 
 data Vec (A : Set) : ℕ → Set where
-  [] : Vec A 0
+  []   : Vec A 0
   Cons : (n : ℕ) → A → Vec A n → Vec A (suc n)
 ```
 So given a known length, a value and a known vector we get a vector
@@ -31,7 +31,7 @@ So lets change the definition of vector
 ```
 infixr 10 _<>_
 data Vector (A : Set) : ℕ → Set where
-  ∅ : Vector A 0
+  ∅    : Vector A 0
   _<>_ : {n : ℕ} → A → Vector A n → Vector A (suc n)
 ```
 I also made `Cons` an infix operator. And here are our vectors again
@@ -61,8 +61,11 @@ User \verb+primFloatPlus+ to define vector addition on vectors of \verb+Float+s
 
 ```
 infixr 6 _+v_
-_+v_ : {n : ℕ} → Vector Float n → Vector Float n → Vector Float n
-∅ +v _ = ∅
+_+v_ : {n : ℕ}
+     → Vector Float n
+     → Vector Float n
+     → Vector Float n
+∅         +v _         = ∅
 (v <> vs) +v (w <> ws) = (primFloatPlus v w) <> (vs +v ws)
 ```
 Again we don't have to care about the case where the length of the vectors
@@ -80,8 +83,11 @@ Implement the scalar product on vectors
 
 ```
 infixr 7 _×_
-_×_ : {n : ℕ} → Vector Float n → Vector Float n → Float
-∅ × _ = 0.0
+_×_ : {n : ℕ}
+    → Vector Float n
+    → Vector Float n
+    → Float
+∅         × _         = 0.0
 (v <> vs) × (w <> ws) = primFloatPlus (primFloatTimes v w) (vs × ws)
 ```
 

@@ -24,28 +24,33 @@ What's that? This is an algebraic data type similar to those we wrote and use
 in Haskell all day long, or at least we would if we could use Haskell all day
 long at work.
 
-\begin{verbatim}
+\begin{haskell}
 data Nat = Zero | Suc Nat
-\end{verbatim}
+\end{haskell}
 
 If we write the same with Haskells GADTs extension we see the resemblance:
 
-\begin{verbatim}
+\begin{haskell}
+{-# LANGUAGE GADTs #-}
+
 data Nat where
   Zero  :: Nat
   Suc   :: Nat -> Nat
-\end{verbatim}
+\end{haskell}
 
 So far so good, but what about \verb+Set Whe state that \verb+Bool+ is of type
 \verb+Set+, which is the type of small types. In Haskell we would say of kind `*`.
 \verb+Set+ itself is of type \verb+Set1+ which is of type \verb+Set2+ and so on. In Haskell
 we would say nothing like this.
 
-\begin{verbatim}
+\begin{haskell}
+{-# LANGUAGE GADTs          #-}
+{-# LANGUAGE KindSignatures #-}
+
 data Bool :: * where
   Zero  :: Nat
   Suc   :: Nat -> Nat
-\end{verbatim}
+\end{haskell}
 
 In other word being a Type in Haskell means being a Set in Agda.
 
@@ -122,7 +127,7 @@ _ =
   ∎
 \end{code}
 
-This is a lot to swallow. First we notice that \verb=2 + 3 ≡ 5= is a type signature.
+This is a lot to take in. First we notice that \verb=2 + 3 ≡ 5= is a type signature.
 And \verb+_≡_+ is a type constructor.
 \begin{verbatim}
 infix 4 _≡_

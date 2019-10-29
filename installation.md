@@ -92,17 +92,17 @@ need a proper editor. We'll cover two:
 \subsubsection{Emacs}
 You can say that Emacs is the official Agda-IDE, and supported by default.
 All you have to do is run:
-\begin{neolisting}
+\begin{verbatim}
 agda-mode setup
-\end{neolisting}
+\end{verbatim}
 
 If you used the stack or nix wrapper you should run
 
-\begin{neolisting}
+\begin{verbatim}
 stack install Agda # or
 cabal v2-install Agda # or
 nix-env -f '<nixpkgs>' -iA haskellPackages.Agda
-\end{neolisting}
+\end{verbatim}
 
 Look at \cite{emacs-mode}. The “Getting Started” section of \cite{plfa}
 has more hints for emacs setup.

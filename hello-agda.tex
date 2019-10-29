@@ -25,6 +25,10 @@
   {neolisting}{Verbatim}
   {frame=single} % Add fancy options here if you like.
 
+\DefineVerbatimEnvironment%
+  {haskell}{Verbatim}
+  {frame=single,label=\textrm{Haskell}}
+
 % https://tex.stackexchange.com/questions/18322/using-fancyvrb-verbatim-environment-from-within-newenvironment
 \usepackage{fancyvrb,caption,floatrow}
 \DeclareNewFloatType{neolistingfloat}{placement=t,fileext=neolisting,name=Listing}
@@ -39,19 +43,20 @@
 \begin{document}
 \maketitle{}
 \begin{abstract}
-These are notes on an workshop to introduce Agda.
-
-I suggest we limit this workshop to 2 hours. This shall be no lecture nor a school.
-I want to make hits interactive and every should take avay something. So I suggest
-we'll take all the time need and contiue where we left next time. OK?
+  These are notes on a workshop to introduce Agda, for the Berlin Haskell User Group.
+  This workshop should be done interactivly and possible limited to 2 hours
+  per session. I dont want to enforce the feeling of a real lecture.
+  This workshop is most of all meant to make fun.
 \end{abstract}
 
-\tableofcontents{}
+\tableofcontents{}\newpage{}
 
+A few question to adjust the focus of the workshop.
 \begin{itemize}
-  \item Who has used Agda before
-  \item Who has used a dependent typed programming language before
-  \item Who used a proof system before
+  \item Who has used Haskell before?
+  \item Who has used Agda before?
+  \item Who has used a dependent typed programming language before?
+  \item Who used a proof system before?
 \end{itemize}
 
 \input{installation.md}
@@ -60,9 +65,8 @@ we'll take all the time need and contiue where we left next time. OK?
 \input{Vector.lagda}
 
 \section{Coming From Haskell}
-\subsection{Unicode}
+\subsection{Unicode and Mixfix}
 \input{unicode.lagda.tex}
-\subsection{Mixfix}
 
 \printbibliography{}
 \end{document}
